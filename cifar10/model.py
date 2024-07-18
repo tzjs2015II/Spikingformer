@@ -185,6 +185,7 @@ class vit_snn(nn.Module):
         self.num_classes = num_classes
         self.depths = depths
         self.T = T
+        # 训练过程中随机跳过（drop）某些网络层
         dpr = [x.item() for x in torch.linspace(0, drop_path_rate, depths)]  # stochastic depth decay rule
 
         patch_embed = SpikingTokenizer(img_size_h=img_size_h,
@@ -192,6 +193,7 @@ class vit_snn(nn.Module):
                           patch_size=patch_size,
                           in_channels=in_channels,
                           embed_dims=embed_dims)
+        
         num_patches = patch_embed.num_patches
         block = nn.ModuleList([SpikingTransformer(
             dim=embed_dims, num_heads=num_heads, mlp_ratio=mlp_ratios, qkv_bias=qkv_bias,
@@ -229,8 +231,7 @@ class vit_snn(nn.Module):
         x = self.forward_features(x)
         x = self.head(x.mean(0))
         return x
-
-
+    
 @register_model
 def Spikingformer(pretrained=False, **kwargs):
     model = vit_snn(

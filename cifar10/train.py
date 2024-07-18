@@ -371,7 +371,7 @@ def main():
     random_seed(args.seed, args.rank)
 
 
-
+    # 导入模型
     import model
     model = create_model(
         'Spikingformer',
